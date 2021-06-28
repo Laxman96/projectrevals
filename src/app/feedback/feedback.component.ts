@@ -10,16 +10,17 @@ import { Router } from '@angular/router';
 export class FeedbackComponent implements OnInit {
   feedbackForm: FormGroup;
   submitted = false;
+  arabicRegex = '[\u0600-\u06FF]';
 
   constructor(private formBuilder: FormBuilder, private route:Router) { }
 
   ngOnInit() {
     this.feedbackForm = this.formBuilder.group({
       title: ['', Validators.required],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      firstName: ['', [Validators.required, Validators.pattern("[a-zA-Z]{1,40}")]],
+      lastName: ['', [Validators.required, Validators.pattern("[a-zA-Z]{1,40}")]],
       email: ['', [Validators.required, Validators.email, Validators.pattern("[a-zA-Z0-9.-_]{1,}@[a-zA-Z.-]{2,}[.]{1}[a-zA-Z]{2,}")]],
-      phnumber: [null, [Validators.required, Validators.pattern("[0-9 ]{10}")]],
+      phnumber: [null, [Validators.required, Validators.pattern("[6-9][0-9]{9}")]],
       feedback:['',Validators.required]
 
   }, {
@@ -31,10 +32,13 @@ export class FeedbackComponent implements OnInit {
 
   onSubmit() {
     // executes the conditions here if form is invalid
+    this.submitted = true;
     if (this.feedbackForm.valid) {
+      
       console.log("Form Submitted!"); 
       let values = this.feedbackForm.value;  
       this.feedbackForm.reset();
+      this.submitted = false;
     this.feedbackForm.setErrors(null); // could be removed
     this.feedbackForm.updateValueAndValidity();
       setTimeout(() => {
@@ -49,6 +53,23 @@ export class FeedbackComponent implements OnInit {
           return;
       }  
        
+  }
+
+  onkeydown($event){
+    const e = <KeyboardEvent>$event;
+    if ($event.key === 'Tab' || $event.key === 'TAB') {
+        return;
+    }
+    let pattern = $event.target.attributes.getNamedItem('assig').value+'';
+
+    const regEx = new RegExp(pattern,'g');
+    console.log(regEx)
+    if (!(regEx.test($event.key))) {
+
+      console.log($event.key);
+        $event.preventDefault() ;
+
+    }
   }
 
   onReset() {
